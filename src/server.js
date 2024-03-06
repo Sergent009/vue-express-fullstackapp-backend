@@ -101,13 +101,15 @@ const products = [{
 
 app.get('/api/products',async (req, res) => {
   const client = await MongoClient.connect(
-    'mongodb://localhost:2717',
+    'mongodb://localhost:27017',
     {useNewUrlParser: true, useUnifiedTopology: true},
+    {serverSelectionTimeoutMS: 5000, }
   )
   const db = client.db('vue-db')
   const products = await db.collection('products').find({}).toArray()  
   res.status(200).json(products)
   client.close()
+
 })
 
 app.get('/api/users/:userId/cart', (req, res) => {
