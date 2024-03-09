@@ -100,6 +100,7 @@ const products = [{
   ];
 
 app.get('/api/products',async (req, res) => {
+  // connecting to mongodb database named 'vue-db'
   const client = await MongoClient.connect(
     'mongodb://localhost:27017',
     {useNewUrlParser: true, useUnifiedTopology: true},
@@ -112,13 +113,44 @@ app.get('/api/products',async (req, res) => {
 
 })
 
-app.get('/api/users/:userId/cart', (req, res) => {
-    res.status(200).json(cartItems)
+app.get('/api/users/:userId/cart',async (req, res) => {
+  const {userId} = req.params
+  
+  // connecting to mongodb database named 'vue-db'
+  const client = await MongoClient.connect(
+    'mongodb://localhost:27017',
+    {useNewUrlParser: true, useUnifiedTopology: true},
+    {serverSelectionTimeoutMS: 5000, }
+  )
+  const db = client.db('vue-db')  
+  const user = await db.collection('users').findOne({ id: userId})
+  
+  // if the user doesn't exists
+  if(!user) return res.status(404).json('Could Not Find The User!')
+  // else if the user exists
+  const products = await db.collection('products').find({}).toArray()
+  const cartItemsIds = user.cartItems
+  const cartItems = cartItemsIds.map(id => 
+    products.find(product => product.id === id)
+    )
+  
+  res.status(200).json(cartItems)
+  client.close()
 })
 
-app.get('/api/products/:productId', (req, res) => {
+app.get('/api/products/:productId',async (req, res) => {
     const {productId} = req.params
-    const product = products.find(product => product.id === productId)
+
+    // connecting to mongodb database named 'vue-db'
+    const client = await MongoClient.connect(
+    'mongodb://localhost:27017',
+    {useNewUrlParser: true, useUnifiedTopology: true},
+    {serverSelectionTimeoutMS: 5000, }
+  )
+  const db = client.db('vue-db')
+  const product = await db.collection('products').findOne({id: productId}) 
+
+
     // if product exists
     if(product){
         res.status(200).json(product)
@@ -126,6 +158,7 @@ app.get('/api/products/:productId', (req, res) => {
     else{
         res.status(404).json('We are unable to find the product')
     }
+    client.close()
 })
 
 app.post('/api/users/:userId/cart', (req, res) => {
