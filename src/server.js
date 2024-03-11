@@ -7,7 +7,7 @@ const app = express()
 app.use(bodyParser.json())
 
 // we want to serve the assets directory whenever whenever a request is recieved on this /images route
-app.use('/images', express.static(path.join(__dirname, '../assets')))
+app.use('/assets', express.static(path.join(__dirname, '../assets')))
 
 app.get('/api/products',async (req, res) => {
   // connecting to mongodb database named 'vue-db'
