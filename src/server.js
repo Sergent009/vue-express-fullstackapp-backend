@@ -6,6 +6,7 @@ import path from 'path'
 const app = express()
 app.use(bodyParser.json())
 
+
 // we want to serve the assets directory whenever whenever a request is recieved on this /images route
 app.use('/assets', express.static(path.join(__dirname, '../assets')))
 
@@ -88,6 +89,7 @@ app.post('/api/users/:userId/cart',async (req, res) => {
     })
     // get the updates user
     const user = await db.collection('users').findOne({id: userId})
+    const products = await db.collection('products').find({}).toArray()
     const cartItemsIds = user.cartItems
     const cartItems = cartItemsIds.map(id =>
       products.find(product => product.id === id)
