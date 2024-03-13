@@ -117,7 +117,7 @@ app.delete('/api/users/:userId/cart/:productId',async (req, res) => {
     const products = await db.collection('products').find({}).toArray()
     const cartItemsIds = user.cartItems
     const cartItems = cartItemsIds.map(id => {
-      products.find(product => product._id === id)
+      products.find(product => product.id === id)
     })
 
     res.status(200).json(cartItems)
